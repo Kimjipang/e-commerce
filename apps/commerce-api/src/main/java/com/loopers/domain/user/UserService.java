@@ -10,6 +10,11 @@ import org.springframework.stereotype.Component;
 public class UserService {
     private final UserRepository userRepository;
 
+    public UserEntity getUserByLoginId(String loginId) {
+        return userRepository.getUserByLoginId(loginId).orElseThrow(
+                () -> new CoreException(ErrorType.NOT_FOUND, "해당 이메일의 사용자가 존재하지 않습니다.")
+        );
+    }
 
     public UserEntity save(UserEntity entity) {
         if (existsByLoginId(entity.getLoginId())) {
@@ -21,6 +26,12 @@ public class UserService {
 
     public boolean existsByLoginId(String loginId) {
         return userRepository.existsByLoginId(loginId);
+    }
+
+    public void checkUserExists(Long id) {
+        userRepository.findById(id).orElseThrow(
+                () -> new CoreException(ErrorType.NOT_FOUND, "해당 ID의 사용자가 존재하지 않습니다.")
+        );
     }
 
 }

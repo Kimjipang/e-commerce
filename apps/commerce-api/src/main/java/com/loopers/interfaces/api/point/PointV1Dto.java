@@ -11,4 +11,13 @@ public class PointV1Dto {
             );
         }
     }
+
+    public record PointChargeRequest(Long userId, Long amount) {
+        public PointChargeRequest toEntity() {
+            return new PointChargeRequest(
+                userId,
+                amount
+            );
+        }
+    }
 }

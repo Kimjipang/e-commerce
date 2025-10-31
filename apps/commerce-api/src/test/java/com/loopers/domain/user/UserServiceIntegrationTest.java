@@ -21,6 +21,8 @@ public class UserServiceIntegrationTest {
     * 통합 테스트
     - [ ] 회원 가입시 User 저장이 수행된다. ( spy 검증 )
     - [ ] 이미 가입된 ID 로 회원가입 시도 시 BAD_REQUEST를 반환한다.
+    - [ ] 해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.
+    - [ ] 해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.
      */
 
     @Autowired
@@ -82,6 +84,49 @@ public class UserServiceIntegrationTest {
 
         // assert
         assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+    }
+
+    @DisplayName("해당 ID 의 회원이 존재할 경우, 회원 정보가 반환된다.")
+    @Test
+    void returnsUserEntity_when_user_exists() {
+        // arrange
+        String loginId = "happy97";
+        String email = "happygimy97@naver.com";
+        String birth = "1997-09-23";
+        String password = "test1234!";
+
+        UserEntity userEntity = new UserEntity(
+                loginId,
+                email,
+                birth,
+                password
+        );
+        userService.save(userEntity);
+
+        // act
+        UserEntity foundUser = userService.getUserByLoginId(loginId);
+
+        // assert
+        assertThat(foundUser).isNotNull();
+        assertThat(foundUser.getLoginId()).isEqualTo(loginId);
+        assertThat(foundUser.getEmail()).isEqualTo(email);
+        assertThat(foundUser.getBirth()).isEqualTo(birth);
+
+    }
+
+    @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null이 반환된다.")
+    @Test
+    void returnsNull_when_user_not_exists() {
+        // arrange
+        String loginId = "happy97";
+
+        // act
+        final CoreException result = assertThrows(CoreException.class, () -> {
+            userService.getUserByLoginId(loginId);
+        });
+
+        // assert
+        assertThat(result.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
     }
 
 }
